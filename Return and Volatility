@@ -1,0 +1,48 @@
+# Sergio Cabrales 
+#################################################
+
+install.packages('quantmod')
+
+library("quantmod")
+
+# EC
+getSymbols("EC", from = "2016-01-01", to = "2018-02-13", src =  "yahoo", adjust =  TRUE)
+
+getQuote("EC")
+
+# daily,weekly,monthly,quarterly, and yearly 
+dailyReturn(EC) # returns by day 
+weeklyReturn(EC) # returns by week 
+monthlyReturn(EC) # returns by month, indexed by yearmon 
+
+allReturns(EC) # note the plural
+
+#Charting
+barChart(EC)
+candleChart(EC,theme='white', type='candles') 
+
+addBBands()
+addRSI()
+addMACD()
+addCMF()
+
+# Return and Volatility I
+rEC <- dailyReturn(EC,type='log')
+vol_EC <- sd(rEC)*sqrt(252)
+
+# Return and Volatility II
+ret <-  log(EC$EC.Adjusted) - log(lag(EC$EC.Adjusted)) 
+vol <- sd(ret, na.rm=TRUE)*sqrt(252)
+
+# Black-Scholes Option Value
+blackscholes <- function(S, K, rf, T, sigma) {
+  values <- c(2)
+  d1 <- (log(S/K)+(rf+sigma^2/2)*T)/(sigma*sqrt(T))
+  d2 <- d1 - sigma * sqrt(T)
+  values[1] <- S*pnorm(d1) - K*exp(-rf*T)*pnorm(d2)
+  values[2] <- K*exp(-rf*T) * pnorm(-d2) - S*pnorm(-d1)
+  values
+}
+
+# Black-Scholes
+blackscholes(16.36,16.50,0.0227,1,vol/100)
